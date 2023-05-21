@@ -43,6 +43,11 @@ const router = createRouter({
             name: 'login',
             component: () => import('../views/login/index.vue')
         },
+        {
+            path: '/signup',
+            name: 'signup',
+            component: () => import('../views/signup/index.vue')
+        },
     ]
 })
 
@@ -52,8 +57,8 @@ router.beforeEach((to, from, next) => {
     const localStorage = userLocalStorage()
     console.log("---路由守卫---")
     console.log("username: #" + userStore.username + "#")
-    if (to.path == '/login') {
-        console.log("---是login直接进入---")
+    if (to.path == '/login' || to.path == '/signup') {
+        console.log("---是login | signup直接进入---")
         next()
         return;
     }

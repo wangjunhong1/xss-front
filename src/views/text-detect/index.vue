@@ -15,18 +15,10 @@
         <el-button type="primary" style="width: 100px;" @click="predict">检测</el-button>
       </div>
     </div>
-<!--    <div class="bottom" v-loading="loading" element-loading-text="检测中...">-->
 
-<!--    </div>-->
     <div class="bottom" v-loading="loading" element-loading-text="检测中...">
       <div class="bottom-left">
         <ul>
-          <li>
-            <div class="title">
-              <div class="block"></div>
-              检测样本：{{ data_model.sample }}
-            </div>
-          </li>
           <li>
             <div class="title">
               <div class="block"></div>
@@ -102,12 +94,6 @@ echarts.use([
   LabelLayout
 ]);
 
-type EChartsOption = echarts.ComposeOption<
-    | TitleComponentOption
-    | TooltipComponentOption
-    | LegendComponentOption
-    | PieSeriesOption
->;
 const option = {
       title: {
         text: '关键词分布',

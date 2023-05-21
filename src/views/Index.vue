@@ -83,7 +83,7 @@
       </el-main>
       <el-footer>
         <div style="text-align: center;font-size: 14px;margin-top: 20px">
-          Copyright © 2023 基于改进TF-IDF的跨站脚本攻击检测系统 All Rights Reserved.
+          Copyright © 2023 基于 VAR-CHI-TF-IDF 的跨站脚本攻击检测系统 All Rights Reserved.
         </div>
       </el-footer>
     </el-container>

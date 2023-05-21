@@ -45,9 +45,9 @@
               <div class="card-content-item">
                 <div class="card-content-item-label">项目地址：</div>
                 <div class="card-content-item-value">
-                  <el-link style="margin: 0 10px" :href="app_info.address.front">前端</el-link>
-                  <el-link style="margin: 0 10px" :href="app_info.address.back">后端</el-link>
-                  <el-link style="margin: 0 10px" :href="app_info.address.model">模型</el-link>
+                  <el-link target="_blank" style="margin: 0 10px" :href="app_info.address.front">前端</el-link>
+                  <el-link target="_blank" style="margin: 0 10px" :href="app_info.address.back">后端</el-link>
+                  <el-link target="_blank" style="margin: 0 10px" :href="app_info.address.model">模型</el-link>
                 </div>
               </div>
             </el-col>
@@ -82,9 +82,9 @@ const app_info = ref({
   developer: '王俊洪',
   email: 'wangjunhong@email.ncu.edu.cn',
   address: {
-    front: "#",
-    back: "#",
-    model: "#"
+    front: "https://github.com/wangjunhong1/xss-front.git",
+    back: "https://github.com/wangjunhong1/xss-back.git",
+    model: "https://github.com/wangjunhong1/xss-model.git"
   },
 })
 </script>

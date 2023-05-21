@@ -95,24 +95,24 @@ const upload_url = ref('http://127.0.0.1:8080/file/upload')
 const model = ref('')
 const options = [
   {
-    value: 'svm',
-    label: '支持向量机',
+    value: 'random_forest',
+    label: '随机森林',
   },
   {
     value: 'decision_tree',
     label: '决策树',
   },
   {
-    value: 'k-means',
-    label: 'K-Means聚类',
-  },
-  {
-    value: 'logistic_regression',
-    label: '对数几率回归',
+    value: 'svm',
+    label: '支持向量机',
   },
   {
     value: 'naive_bayes',
     label: '朴素贝叶斯',
+  },
+  {
+    value: 'k-means',
+    label: 'K-Means聚类',
   }
 ]
 const is_selected_file = ref(false)

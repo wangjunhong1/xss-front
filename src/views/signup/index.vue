@@ -12,6 +12,7 @@
           <h1 class="title">XSS检测系统</h1>
           <el-input
               v-model="user.username"
+              autocomplete="false"
               class="input"
               placeholder="请输入用户名"
               size="large">
@@ -39,6 +40,24 @@
               </div>
             </template>
           </el-input>
+          <el-input
+              v-model="user.password_again"
+              class="input"
+              size="large"
+              :type="is_show_again?'text':'password'"
+              placeholder="请再次输入密码">
+            <template #prefix>
+              <el-icon>
+                <Lock/>
+              </el-icon>
+            </template>
+            <template #append>
+              <div class="eye" @click="is_show_again=!is_show_again">
+                <img src="@/assets/login/eye-show.svg" v-if="is_show_again">
+                <img src="@/assets/login/eye-hide.svg" v-else>
+              </div>
+            </template>
+          </el-input>
           <el-input size="large"
                     class="input"
                     v-model="check_code">
@@ -47,12 +66,15 @@
             </template>
           </el-input>
           <div class="input input-div">
-            <div>保存登录状态
-              <el-switch v-model="remember" style="margin-left: 5px"/>
+            <div>注册后自动登录
+              <el-switch v-model="login_auto" style="margin-left: 5px"/>
+            </div>
+            <div style="margin: 0 10px">
+              <el-link href="/login" type="primary">已有账号？立即登录</el-link>
             </div>
           </div>
           <el-button type="primary" size="large" style="width: 100%" class="input"
-                     @click="login(user.username,user.password)" :loading="logining">登录
+                     @click="signup(user.username,user.password)" :loading="signuping">注册
           </el-button>
         </form>
       </div>
@@ -60,11 +82,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import CheckCode from "@/components/login/CheckCode.vue"
 import {ref, reactive} from 'vue'
 import eventBus from "@/utils/eventBus";
-import {login as loginAPI} from "@/api/userAPI";
+import {login as loginAPI, signup as signupAPI} from "@/api/userAPI";
 import swal from 'sweetalert'
 import {useUserStore, userLocalStorage} from "@/stores/user";
 import {useRouter} from "vue-router";
@@ -72,72 +94,162 @@ import {useRouter} from "vue-router";
 const user = reactive({
   username: '',
   password: '',
+  password_again: ''
 })
 
 const is_show = ref(false)
-const remember = ref(true)
+const is_show_again = ref(false)
+const login_auto = ref(true)
 const check_code = ref('')
 const real_check_code = ref('')
-const logining = ref(false)
+const signuping = ref(false)
 const store = useUserStore()
 const router = useRouter()
 
-function login() {
-  logining.value = true
+function check_password(password: string) {
+  return password.match('^(?=.*[_a-zA-Z])(?=.*\\d).{6,}$')
+}
+
+function signup() {
+  signuping.value = true
   if (user.username === "" || user.password === "") {
-    logining.value = false
+    signuping.value = false
     swal({
-      title: "用户名密码不完整",
+      title: "用户账户密码输入不完整",
       text: "请重新输入",
       icon: "warning",
-      button: "确定",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    return;
+  }
+  if (!check_password(user.password)) {
+    signuping.value = false
+    swal({
+      title: "弱密码",
+      text: "密码至少需要包含一个字母(或下划线)和一个数字，且至少需要有6个字符长度",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    return;
+  }
+  if (user.password != user.password_again) {
+    signuping.value = false
+    swal({
+      title: "密码输入不一致",
+      text: "请重新输入",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
     });
     return;
   }
   if (check_code.value.toUpperCase() === real_check_code.value.toUpperCase()) {
-    loginAPI(user.username, user.password).then((data) => {
-      logining.value = false
-      const res = data.data
-      if (res.state === 200) {
-        // 登陆成功，存储Store并跳转
-        store.login(user.username)
-        userLocalStorage().logout()
-        if (remember) {
-          userLocalStorage().login(user.username)
+    signupAPI(user.username, user.password).then((val) => {
+      let response = val.data
+      if (response.state == 200) {
+        if (login_auto.value) {
+          loginAPI(user.username, user.password).then((val) => {
+            let res = val.data
+            if (res.state === 200) {
+              // 登陆成功，存储Store并跳转
+              store.login(user.username)
+              userLocalStorage().login(user.username)
+              router.push("/")
+              console.log("登陆成功" + store.username)
+            } else if (res.state === 300) {
+              swal({
+                title: "账号或密码错误>_<",
+                text: "请检查账号密码是否正确",
+                icon: "warning",
+                buttons: {
+                  confirm: {
+                    text: '确定',
+                    value: true,
+                  },
+                }
+              })
+            } else {
+              swal({
+                title: "服务器罢工了>_<",
+                text: "请稍后再试",
+                icon: "error",
+                buttons: {
+                  confirm: {
+                    text: '确定',
+                    value: true,
+                  },
+                }
+              })
+            }
+          }).catch(() => {
+            swal({
+              title: "服务器罢工了>_<",
+              text: "请稍后再试",
+              icon: "error",
+              buttons: {
+                confirm: {
+                  text: '确定',
+                  value: true,
+                },
+              }
+            })
+          })
+        } else {
+
         }
-        router.push("/")
-        console.log("登陆成功" + store.username)
-      } else if (res.state === 300) {
+      } else if (response.state == 300) {
         swal({
-          title: "账号或密码错误>_<",
-          text: "请检查账号密码是否正确",
-          icon: "warning",
-          button: "确定",
-        })
-      } else {
-        swal({
-          title: "服务器罢工了>_<",
-          text: "请稍后再试",
+          title: "注册失败",
+          text: "用户名已存在",
           icon: "error",
-          button: "确定",
+          buttons: {
+            confirm: {
+              text: '确定',
+              value: true,
+            },
+          }
         })
       }
+      signuping.value = false
     }).catch(() => {
-      logining.value = false
       swal({
         title: "服务器罢工了>_<",
         text: "请稍后再试",
         icon: "error",
-        button: "确定",
+        buttons: {
+          confirm: {
+            text: '确定',
+            value: true,
+          },
+        }
       })
     })
   } else {
-    logining.value = false
+    signuping.value = false
     swal({
       title: "验证码错误",
       text: "请重新输入",
       icon: "warning",
-      button: "确定",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
     });
     eventBus.emit("check_fail")
   }

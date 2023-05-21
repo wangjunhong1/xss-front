@@ -50,6 +50,9 @@
             <div>保存登录状态
               <el-switch v-model="remember" style="margin-left: 5px"/>
             </div>
+            <div style="margin: 0 10px">
+              <el-link href="/signup" type="primary">没有账号？立即注册</el-link>
+            </div>
           </div>
           <el-button type="primary" size="large" style="width: 100%" class="input"
                      @click="login(user.username,user.password)" :loading="logining">登录
@@ -90,7 +93,12 @@ function login() {
       title: "用户名密码不完整",
       text: "请重新输入",
       icon: "warning",
-      button: "确定",
+      buttons: {
+                confirm: {
+                  text: '确定',
+                  value: true,
+                },
+              }
     });
     return;
   }
@@ -112,14 +120,24 @@ function login() {
           title: "账号或密码错误>_<",
           text: "请检查账号密码是否正确",
           icon: "warning",
-          button: "确定",
+          buttons: {
+                confirm: {
+                  text: '确定',
+                  value: true,
+                },
+              }
         })
       } else {
         swal({
           title: "服务器罢工了>_<",
           text: "请稍后再试",
           icon: "error",
-          button: "确定",
+          buttons: {
+                confirm: {
+                  text: '确定',
+                  value: true,
+                },
+              }
         })
       }
     }).catch(() => {
@@ -128,7 +146,12 @@ function login() {
         title: "服务器罢工了>_<",
         text: "请稍后再试",
         icon: "error",
-        button: "确定",
+        buttons: {
+                confirm: {
+                  text: '确定',
+                  value: true,
+                },
+              }
       })
     })
   } else {
@@ -137,7 +160,12 @@ function login() {
       title: "验证码错误",
       text: "请重新输入",
       icon: "warning",
-      button: "确定",
+      buttons: {
+                confirm: {
+                  text: '确定',
+                  value: true,
+                },
+              }
     });
     eventBus.emit("check_fail")
   }
