@@ -91,7 +91,7 @@ import swal from 'sweetalert'
 import {predict as file_predict} from "@/api/fileAPI";
 import {exportJsonToExcel} from "@/utils/exportExcel";
 
-const upload_url = ref('http://127.0.0.1:8080/file/upload')
+const upload_url = ref('http://127.0.0.1:8081/file/upload')
 const model = ref('')
 const options = [
   {
