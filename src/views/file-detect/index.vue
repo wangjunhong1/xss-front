@@ -107,10 +107,6 @@ const options = [
     label: '支持向量机',
   },
   {
-    value: 'naive_bayes',
-    label: '朴素贝叶斯',
-  },
-  {
     value: 'k-means',
     label: 'K-Means聚类',
   }
