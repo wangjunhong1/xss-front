@@ -60,9 +60,20 @@
           </el-input>
           <el-input size="large"
                     class="input"
-                    v-model="check_code">
+                    v-model="check_code"
+                    placeholder="请输入图片验证码">
             <template #append>
               <check-code @change="val=>real_check_code=val" style="width: 100%;margin: 0;padding: 0"></check-code>
+            </template>
+          </el-input>
+          <el-input size="large"
+                    class="input"
+                    v-model="phone_sms"
+                    :placeholder="sms_code_sending?'请输入手机验证码':'请输入手机号'">
+            <template #append>
+              <el-button @click="sendCode" ref="sms_button" type="primary" style="width: 200px">
+                {{ sms_code_sending ? clock + "s" : "发送验证码" }}
+              </el-button>
             </template>
           </el-input>
           <div class="input input-div">
@@ -90,6 +101,7 @@ import {login as loginAPI, signup as signupAPI} from "@/api/userAPI";
 import swal from 'sweetalert'
 import {useUserStore, userLocalStorage} from "@/stores/user";
 import {useRouter} from "vue-router";
+import {sms_send} from '@/api/smsAPI';
 
 const user = reactive({
   username: '',
@@ -101,10 +113,14 @@ const is_show = ref(false)
 const is_show_again = ref(false)
 const login_auto = ref(true)
 const check_code = ref('')
+const phone_sms = ref('')
 const real_check_code = ref('')
 const signuping = ref(false)
 const store = useUserStore()
 const router = useRouter()
+const sms_code_sending = ref(false)
+const clock = ref(120)
+const sms_real_code = ref("------")
 
 function check_password(password: string) {
   return password.match('^(?=.*[_a-zA-Z])(?=.*\\d).{6,}$')
@@ -112,52 +128,7 @@ function check_password(password: string) {
 
 function signup() {
   signuping.value = true
-  if (user.username === "" || user.password === "") {
-    signuping.value = false
-    swal({
-      title: "用户账户密码输入不完整",
-      text: "请重新输入",
-      icon: "warning",
-      buttons: {
-        confirm: {
-          text: '确定',
-          value: true,
-        },
-      }
-    });
-    return;
-  }
-  if (!check_password(user.password)) {
-    signuping.value = false
-    swal({
-      title: "弱密码",
-      text: "密码至少需要包含一个字母(或下划线)和一个数字，且至少需要有6个字符长度",
-      icon: "warning",
-      buttons: {
-        confirm: {
-          text: '确定',
-          value: true,
-        },
-      }
-    });
-    return;
-  }
-  if (user.password != user.password_again) {
-    signuping.value = false
-    swal({
-      title: "密码输入不一致",
-      text: "请重新输入",
-      icon: "warning",
-      buttons: {
-        confirm: {
-          text: '确定',
-          value: true,
-        },
-      }
-    });
-    return;
-  }
-  if (check_code.value.toUpperCase() === real_check_code.value.toUpperCase()) {
+  if (phone_sms.value.toUpperCase() === sms_real_code.value.toUpperCase()) {
     signupAPI(user.username, user.password).then((val) => {
       let response = val.data
       if (response.state == 200) {
@@ -242,6 +213,114 @@ function signup() {
     signuping.value = false
     swal({
       title: "验证码错误",
+      text: "请重新输入",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    eventBus.emit("check_fail")
+  }
+}
+
+function sendCode() {
+  sms_code_sending.value = true
+  if (user.username === "" || user.password === "") {
+    sms_code_sending.value = false
+    swal({
+      title: "用户账户密码输入不完整",
+      text: "请重新输入",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    return;
+  }
+  if (!check_password(user.password)) {
+    sms_code_sending.value = false
+    swal({
+      title: "弱密码",
+      text: "密码至少需要包含一个字母(或下划线)和一个数字，且至少需要有6个字符长度",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    return;
+  }
+  if (user.password != user.password_again) {
+    sms_code_sending.value = false
+    swal({
+      title: "密码输入不一致",
+      text: "请重新输入",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    return;
+  }
+  if (!phone_sms.value.match(/^1[3456789]\d{9}$/)) {
+    sms_code_sending.value = false
+    swal({
+      title: "手机号为空或格式有误",
+      text: "请重新输入",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      }
+    });
+    return;
+  }
+  if (check_code.value.toUpperCase() === real_check_code.value.toUpperCase()) {
+    let timer = setInterval(() => {
+      clock.value--
+      if (clock.value < 0) {
+        clock.value = 120
+        sms_real_code.value = "------"
+        sms_code_sending.value = false
+        clearInterval(timer)
+      }
+    }, 1000)
+    sms_send(phone_sms.value).then((val) => {
+      console.log(val.data)
+      sms_real_code.value = val.data.sms_code
+      phone_sms.value = ""
+    }).catch(() => {
+      sms_code_sending.value = false
+      clock.value = 120
+      swal({
+        title: "服务器罢工了>_<",
+        text: "请稍后再试",
+        icon: "error",
+        buttons: {
+          confirm: {
+            text: '确定',
+            value: true,
+          },
+        }
+      })
+    })
+  } else {
+    sms_code_sending.value = false
+    swal({
+      title: "图片验证码错误",
       text: "请重新输入",
       icon: "warning",
       buttons: {

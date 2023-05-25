@@ -22,3 +22,7 @@ export const detectListRequest = axios.create({
     baseURL: 'http://' + host + ':' + port + '/detect_list'
 })
 
+export const smsRequest = axios.create({
+    baseURL: 'http://' + host + ':' + port + '/sms'
+})
+
