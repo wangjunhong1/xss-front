@@ -5,8 +5,11 @@
         <img src="https://avatars.githubusercontent.com/u/65681015?v=4" alt="avatar">
       </div>
       <div class="name">跨站脚本攻击检测系统</div>
-      <div class="description">
-        本系统基于改进TF-IDF的跨站脚本攻击检测算法，采用Python和Java等编程语言，使用Web开发技术，主要功能涵盖注册登录、文件检测、文本检测等，系统功能稳定性和可用性都较好。
+      <div class="description" style="font-size: 20px">
+        基于 VAR-CHI-TF-IDF 的跨站脚本攻击检测算法，设计并实现了一个跨站
+        脚本攻击检测系统，主要功能涵盖注册登录、文件检测、文本检测等。测试表明，
+        系统能够正确对用户上传的文件及文本进行跨站脚本攻击检测，检测准确率高，
+        速度快，能够满足实际应用需求
       </div>
     </div>
     <div class="skills">
