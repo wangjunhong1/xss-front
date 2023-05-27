@@ -2,7 +2,7 @@
   <div class="about">
     <div class="info">
       <div class="avatar">
-        <img src="https://avatars.githubusercontent.com/u/65681015?v=4" alt="avatar">
+        <img src="@/assets/logo.png" alt="logo">
       </div>
       <div class="name">跨站脚本攻击检测系统</div>
       <div class="description" style="font-size: 20px">
@@ -117,9 +117,9 @@ const app_info = ref({
 }
 
 .name {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin: 20px 20px;
 }
 
 .description {
