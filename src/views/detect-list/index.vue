@@ -24,7 +24,12 @@
           <el-table-column align="center" prop="startDate" label="开始时间"/>
           <el-table-column align="center" prop="finishDate" label="结束时间"/>
           <el-table-column align="center" prop="useModel" label="检测模型"/>
-          <el-table-column align="center" prop="result" label="检测结果"/>
+          <el-table-column align="center" prop="result" label="检测结果"
+                           :filters="[
+                             {text:'正常样本',value:'正常样本'},
+                             {text:'攻击样本',value: '攻击样本'},
+                             ]"
+                           :filter-method="filterModel"/>
           <el-table-column align="center" prop="keyword" label="关键字"/>
         </el-table>
       </div>
@@ -55,12 +60,12 @@ import {exportJsonToExcel} from "@/utils/exportExcel";
 const current_page = ref(1)
 const page_size = ref(15)
 const totalSize = ref(0)
-const date_range = ref([null,null])
+const date_range = ref([null, null])
 const is_filter = ref(false)
 
 function filter_list() {
   if (is_filter.value) {
-    date_range.value=[null,null]
+    date_range.value = [null, null]
     current_page.value = 1
     get_page()
     return
@@ -118,12 +123,16 @@ const date_shortcuts = [
   }
 ]
 
+const filterModel = (value: string, row: any) => {
+  return row.result === value
+}
+
 function get_index(index: number) {
   return (current_page.value - 1) * page_size.value + index + 1
 }
 
 function download() {
-  list(date_range.value[0],date_range.value[1]).then(
+  list(date_range.value[0], date_range.value[1]).then(
       (val) => {
         exportJsonToExcel(val.data)
       }

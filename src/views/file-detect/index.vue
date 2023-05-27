@@ -64,20 +64,12 @@
         <el-table-column prop="index" label="编号" width="100"/>
         <el-table-column prop="url" label="网址" min-width="220"/>
         <el-table-column prop="keyword" label="关键词"/>
-        <el-table-column prop="model" label="使用模型"
-                         :filters="[
-                             {text:'支持向量机',value:'支持向量机'},
-                             {text:'决策树',value: '决策树'},
-                             {text:'K-Means',value: 'K-Means'},
-                             {text:'对数几率回归',value: '对数几率回归'},
-                             {text:'朴素贝叶斯',value: '朴素贝叶斯'},
-                             ]"
-                         :filter-method="filterModel"/>
+        <el-table-column prop="model" label="使用模型"/>
         <el-table-column prop="date" label="检测日期"/>
-        <el-table-column prop="label" label="是否为XSS攻击" sortable
+        <el-table-column prop="label" label="是否为XSS攻击"
                          :filters="[
-                             {text:'是',value:'是'},
-                             {text:'否',value: '否'}
+                             {text:'是',value:'攻击样本'},
+                             {text:'否',value: '正常样本'}
                              ]"
                          :filter-method="filterLabel"/>
       </el-table>
@@ -239,10 +231,6 @@ interface TableData {
 
 const filterLabel = (value: string, row: TableData) => {
   return row.label === value
-}
-
-const filterModel = (value: string, row: TableData) => {
-  return row.model === value
 }
 
 </script>
