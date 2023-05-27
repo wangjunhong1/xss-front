@@ -222,7 +222,6 @@ function signup() {
         },
       }
     });
-    eventBus.emit("check_fail")
   }
 }
 

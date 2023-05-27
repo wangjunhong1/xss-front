@@ -21,7 +21,7 @@
           </div>
           <template #tip>
             <div class="el-upload__tip">
-              csv file with a size less than 20MB
+              csv file with a size less than 500kB
             </div>
           </template>
         </el-upload>
@@ -126,6 +126,7 @@ const handleChange = (rawFile: File) => {
   }
 }
 const on_success = () => {
+  loading.value = true
   file_predict(model.value).then((val) => {
     let data = val.data
     table_data.value = data
@@ -158,7 +159,7 @@ const before_upload = (uploadRawFile: UploadRawFile) => {
   console.log("开始上传")
   const size = uploadRawFile.size
   file.value = uploadRawFile
-  if (size > 20971520) {
+  if (size > 500 * 1024) {
     swal({
       title: "文件大小超过限制>_<",
       text: "请压缩文件再试",
@@ -170,6 +171,24 @@ const before_upload = (uploadRawFile: UploadRawFile) => {
         },
       },
     })
+    loading.value = false
+    return false
+  }
+
+  if(!uploadRawFile.name.endsWith(".csv")){
+    swal({
+      title: "文件格式有误>_<",
+      text: "仅支持csv文件格式",
+      icon: "warning",
+      buttons: {
+        confirm: {
+          text: '确定',
+          value: true,
+        },
+      },
+    })
+    loading.value = false
+    return false
   }
 }
 
@@ -190,7 +209,6 @@ const predict = () => {
   }
   if (is_selected_file.value) {
     uploadRef.value!.submit()
-    loading.value = true
   } else {
     swal({
       title: "没有选择文件>_<",
